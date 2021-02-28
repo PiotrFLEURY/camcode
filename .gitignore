@@ -17,3 +17,6 @@ example/build/
 example/.metadata
 example/.packages
 example/camcode_example.iml
+
+.firebase/
+.firebaserc

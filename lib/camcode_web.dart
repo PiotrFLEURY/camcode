@@ -24,7 +24,7 @@ class CamcodeWeb {
 
   bool gotResult = false;
 
-  Completer completer = Completer();
+  Completer completer;
 
   static void registerWith(Registrar registrar) {
     MethodChannel channel = MethodChannel(
@@ -66,6 +66,8 @@ class CamcodeWeb {
   }
 
   int initialize(double width, double height, int refreshDelayMillis) {
+    completer = Completer();
+    gotResult = false;
     // Create a video element which will be provided with stream source
     _webcamVideoElement = VideoElement()
       ..width = width.toInt()
