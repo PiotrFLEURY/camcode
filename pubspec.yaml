@@ -5,6 +5,11 @@ version: 1.0.0
 flutter:
   plugin:
     platforms:
+      android:
+        package: com.example.camcode
+        pluginClass: CamcodePlugin
+      ios:
+        pluginClass: CamcodePlugin
       web:
         pluginClass: CamcodeWeb
         fileName: camcode_web.dart

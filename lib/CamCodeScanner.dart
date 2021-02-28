@@ -1,10 +1,6 @@
 import 'dart:async';
-import 'dart:html';
-import 'dart:js';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:ui' as ui;
-import 'package:camcode/quagga.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CamCodeScanner extends StatefulWidget {
   final bool showDebugFrames;
@@ -26,123 +22,56 @@ class CamCodeScanner extends StatefulWidget {
 }
 
 class _CamCodeScannerState extends State<CamCodeScanner> {
+  final MethodChannel channel = MethodChannel('camcode');
   // Webcam widget to insert into the tree
   Widget _webcamWidget;
   Widget _imageWidget;
-  // VideoElement
-  VideoElement _webcamVideoElement;
-  // ImageElement
-  ImageElement imageElement;
-
-  ImageData image;
-
-  Timer _timer;
 
   String barcode;
 
-  bool gotResult = false;
+  bool initialized = false;
 
   @override
   void initState() {
     super.initState();
-    // Create a video element which will be provided with stream source
-    _webcamVideoElement = VideoElement()
-      ..width = widget.width.toInt()
-      ..height = widget.height.toInt()
-      ..autoplay = true;
 
-    imageElement = ImageElement()
-      ..width = 320
-      ..height = 320;
+    initialize();
+  }
 
-    // Register an webcam
-
-    final time = DateTime.now().microsecondsSinceEpoch;
-
-    // ignore: undefined_prefixed_name
-    ui.platformViewRegistry.registerViewFactory(
-      'webcamVideoElement$time',
-      (int viewId) => _webcamVideoElement,
+  Future<void> initialize() async {
+    int time = await channel.invokeMethod(
+      "initialize",
+      [
+        widget.width,
+        widget.height,
+        widget.refreshDelayMillis,
+      ],
     );
-    // ignore: undefined_prefixed_name
-    ui.platformViewRegistry.registerViewFactory(
-      'imageElement',
-      (int viewId) => imageElement,
-    );
+
     // Create video widget
     _webcamWidget =
         HtmlElementView(key: UniqueKey(), viewType: 'webcamVideoElement$time');
 
     _imageWidget = HtmlElementView(viewType: 'imageElement');
-    // Access the webcam stream
-    if (window.location.protocol.contains("https")) {
-      var options;
-      if (window.navigator.userAgent.contains("Mobi")) {
-        options = {
-          'video': {
-            'facingMode': {'exact': "environment"}
-          }
-        };
-      } else {
-        options = {'video': true};
-      }
-      window.navigator.mediaDevices
-          .getUserMedia(options)
-          .then((MediaStream stream) {
-        _webcamVideoElement.srcObject = stream;
-      });
-    } else {
-      window.navigator.getUserMedia(video: true).then((MediaStream stream) {
-        _webcamVideoElement.srcObject = stream;
-      });
-    }
 
-    Future.delayed(Duration(seconds: 1), () {
-      _timer = Timer.periodic(Duration(milliseconds: widget.refreshDelayMillis),
-          (timer) async {
-        _takePicture();
-      });
+    setState(() {
+      initialized = true;
     });
+
+    _waitForResult();
   }
 
-  void _takePicture() async {
-    CanvasElement _canvasElement = CanvasElement(
-        width: _webcamVideoElement.width, height: _webcamVideoElement.height);
-    final context = _canvasElement.context2D;
-    context.drawImageScaled(
-      _webcamVideoElement,
-      0,
-      0,
-      _webcamVideoElement.width,
-      _webcamVideoElement.height,
-    );
-    image =
-        context.getImageData(0, 0, _canvasElement.width, _canvasElement.height);
-    if (image != null) {
-      final dataUrl = _canvasElement.toDataUrl('image/png');
-      imageElement.src = dataUrl;
-
-      setState(() {});
-
-      detectBarcode(dataUrl, allowInterop((result) => onBarcodeResult(result)));
-    }
+  Future<void> _waitForResult() async {
+    channel
+        .invokeMethod("fetchResult")
+        .then((barcode) => onBarcodeResult(barcode));
   }
 
   Future<void> onBarcodeResult(String _barcode) async {
-    if (!gotResult) {
-      gotResult = true;
-      releaseResources();
-      print("onBarcodeResult $_barcode");
-      setState(() {
-        barcode = _barcode;
-      });
-      widget.onBarcodeResult(barcode);
-    }
-  }
-
-  Future<void> releaseResources() async {
-    _timer.cancel();
-    _webcamVideoElement.pause();
+    setState(() {
+      barcode = _barcode;
+    });
+    widget.onBarcodeResult(barcode);
   }
 
   @override
@@ -150,7 +79,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async {
-          releaseResources();
+          channel.invokeMethod('releaseResources');
           return true;
         },
         child: Builder(
@@ -158,12 +87,14 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                SizedBox(
-                  width: widget.width,
-                  height: widget.height,
-                  child: _webcamWidget,
-                ),
-                image == null || !widget.showDebugFrames
+                initialized
+                    ? SizedBox(
+                        width: widget.width,
+                        height: widget.height,
+                        child: _webcamWidget,
+                      )
+                    : Text("loading camera..."),
+                !widget.showDebugFrames
                     ? Container()
                     : SizedBox(
                         width: 100,
