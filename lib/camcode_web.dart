@@ -26,6 +26,8 @@ class CamcodeWeb {
 
   Completer completer;
 
+  MediaStream mediaStream;
+
   static void registerWith(Registrar registrar) {
     MethodChannel channel = MethodChannel(
       'camcode',
@@ -112,7 +114,8 @@ class CamcodeWeb {
       });
     } else {
       window.navigator.getUserMedia(video: true).then((MediaStream stream) {
-        _webcamVideoElement.srcObject = stream;
+        mediaStream = stream;
+        _webcamVideoElement.srcObject = mediaStream;
       });
     }
 
@@ -159,5 +162,10 @@ class CamcodeWeb {
   Future<void> releaseResources() async {
     _timer.cancel();
     _webcamVideoElement.pause();
+    mediaStream.getVideoTracks().forEach((track) {
+      track.stop();
+      track.enabled = false;
+    });
+    _webcamVideoElement.srcObject = null;
   }
 }
