@@ -162,7 +162,7 @@ class CamcodeWeb {
   Future<void> releaseResources() async {
     _timer.cancel();
     _webcamVideoElement.pause();
-    mediaStream.getVideoTracks().forEach((track) {
+    mediaStream.getTracks().forEach((track) {
       track.stop();
       track.enabled = false;
     });

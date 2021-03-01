@@ -48,7 +48,7 @@ class _MyAppState extends State<MyApp> {
       builder: (context) => CamCodeScanner(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        refreshDelayMillis: 200,
+        refreshDelayMillis: 800,
         onBarcodeResult: (barcode) {
           Navigator.of(context).pushNamed("/", arguments: barcode);
         },
