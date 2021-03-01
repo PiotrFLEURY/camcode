@@ -1,4 +1,4 @@
-import 'package:camcode/CamCodeScanner.dart';
+import 'package:camcode/cam_code_scanner.dart';
 import 'package:flutter/material.dart';
 
 void main() {
