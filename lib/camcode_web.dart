@@ -7,7 +7,7 @@ import 'dart:html';
 import 'dart:js';
 import 'dart:ui' as ui;
 
-import 'package:camcode/quagga.dart';
+import 'package:camcode/barcode.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
