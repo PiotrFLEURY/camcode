@@ -4,19 +4,6 @@ A camera barcode scan library for Flutter Web
 
 ## Getting Started
 
-# Add to pubspec.yaml
-
-```
-dependencies:
-    camcode: ^1.0.0
-```
-
-# Run flutter pub get
-
-```
-$ flutter pub get
-```
-
 # Add a javascript file for barcode scan
 
 ```

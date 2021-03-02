@@ -1,6 +1,6 @@
 name: camcode
 description: A camera barcode scanner for Flutter Web using your favorite Javascript library
-version: 1.0.1
+version: 1.0.2
 repository: https://github.com/PiotrFLEURY/camcode
 homepage: https://camcode-59c70.web.app/
 
@@ -29,4 +29,4 @@ dev_dependencies:
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
-  flutter: ">=1.26.0-17.8.pre"
+  flutter: ">=1.22.6"

@@ -1,3 +1,8 @@
+## 1.0.2
+
+* Clean README
+* Set correct version of flutter
+
 ## 1.0.1
 
 * Fix camera resource release

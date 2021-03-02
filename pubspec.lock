@@ -156,4 +156,4 @@ packages:
     version: "2.1.0"
 sdks:
   dart: ">=2.12.0-0.0 <3.0.0"
-  flutter: ">=1.26.0-17.8.pre"
+  flutter: ">=1.22.6"
