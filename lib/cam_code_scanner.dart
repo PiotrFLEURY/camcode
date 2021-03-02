@@ -2,13 +2,34 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// Camera barcode scanner widget
+/// Asks for camera access permission
+/// Shows camera images stream
+/// Captures pictures every 'refreshDelayMillis'
+/// Ask your favorite javascript library
+/// to identify a barcode in the current picture
 class CamCodeScanner extends StatefulWidget {
+  // shows the current analysing picture
   final bool showDebugFrames;
+
+  // call back to trigger on barcode result
   final Function onBarcodeResult;
+
+  // width dimension
   final double width;
+
+  // height dimension
   final double height;
+
+  // delay between to picture analysis
   final int refreshDelayMillis;
 
+  /// Camera barcode scanner widget
+  /// Params:
+  /// * showDebugFrames [true|false] - shows the current analysing picture
+  /// * onBarcodeResult - call back to trigger on barcode result
+  /// * width, height - dimensions
+  /// * refreshDelayMillis - delay between to picture analysis
   CamCodeScanner({
     this.showDebugFrames = false,
     @required this.onBarcodeResult,
@@ -22,9 +43,11 @@ class CamCodeScanner extends StatefulWidget {
 }
 
 class _CamCodeScannerState extends State<CamCodeScanner> {
+  // communication channel between widget and platform code
   final MethodChannel channel = MethodChannel('camcode');
   // Webcam widget to insert into the tree
   Widget _webcamWidget;
+  // Debug frame Image widget to insert into the tree
   Widget _imageWidget;
   // The barcode result
   String barcode;

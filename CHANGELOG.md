@@ -1,3 +1,8 @@
+## 1.0.3
+
+* Add missing documentation
+* Fix analysis errors
+
 ## 1.0.2
 
 * Clean README
