@@ -13,21 +13,20 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 /// A web implementation of the Camcode plugin.
 class CamcodeWeb {
-  // VideoElement
+  // VideoElement used to display the camera image
   VideoElement _webcamVideoElement;
-  // ImageElement
+  // ImageElement used to display taken pictures
   ImageElement imageElement;
-
+  // The current processing image
   ImageData image;
-
+  // timer shceduling the pictures treatment process
   Timer _timer;
-
+  // indicates if the the scan got result or not
   bool gotResult = false;
-
+  // used to transmit result to the Widget via MethodChannel
   Completer completer;
 
-  MediaStream mediaStream;
-
+  // Registering method
   static void registerWith(Registrar registrar) {
     MethodChannel channel = MethodChannel(
       'camcode',
@@ -39,6 +38,7 @@ class CamcodeWeb {
     channel.setMethodCallHandler(pluginInstance.handleMethodCall);
   }
 
+  // handle channel calls
   Future<dynamic> handleMethodCall(MethodCall call) async {
     switch (call.method) {
       case 'initialize':
@@ -63,10 +63,17 @@ class CamcodeWeb {
     }
   }
 
+  // wait for the result to be completed
   Future<String> fetchResult() {
     return completer.future;
   }
 
+  /// Initialize the scanner :
+  /// - request user permission
+  /// - request camera stream
+  /// - initialize video
+  /// - start video streaming
+  /// - start picture snapshot timer scheduling
   int initialize(double width, double height, int refreshDelayMillis) {
     completer = Completer();
     gotResult = false;
@@ -96,12 +103,12 @@ class CamcodeWeb {
     );
 
     // Access the webcam stream
-    if (window.location.protocol.contains("https")) {
+    if (window.location.protocol.contains('https')) {
       var options;
-      if (window.navigator.userAgent.contains("Mobi")) {
+      if (window.navigator.userAgent.contains('Mobi')) {
         options = {
           'video': {
-            'facingMode': {'exact': "environment"}
+            'facingMode': {'exact': 'environment'}
           }
         };
       } else {
@@ -114,8 +121,7 @@ class CamcodeWeb {
       });
     } else {
       window.navigator.getUserMedia(video: true).then((MediaStream stream) {
-        mediaStream = stream;
-        _webcamVideoElement.srcObject = mediaStream;
+        _webcamVideoElement.srcObject = stream;
       });
     }
 
@@ -129,6 +135,8 @@ class CamcodeWeb {
     return time;
   }
 
+  /// Takes a picture of the current camera image
+  /// and process it for barcode identification
   void _takePicture() async {
     CanvasElement _canvasElement = CanvasElement(
         width: _webcamVideoElement.width, height: _webcamVideoElement.height);
@@ -150,19 +158,20 @@ class CamcodeWeb {
     }
   }
 
+  // Method called on barcode result to finish the process and send result
   Future<void> onBarcodeResult(String _barcode) async {
     if (!gotResult) {
       gotResult = true;
       releaseResources();
-      print("onBarcodeResult $_barcode");
       completer.complete(_barcode);
     }
   }
 
+  // Release resources to avoid leaks
   Future<void> releaseResources() async {
     _timer.cancel();
     _webcamVideoElement.pause();
-    mediaStream.getTracks().forEach((track) {
+    _webcamVideoElement.srcObject.getTracks().forEach((track) {
       track.stop();
       track.enabled = false;
     });

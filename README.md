@@ -41,7 +41,7 @@ function detectBarcode(dataUrl, callback) {
 # Use it
 
 ```
-import 'package:camcode/CamCodeScanner.dart';
+import 'package:camcode/cam_code_scanner.dart';
 
 showDialog(
     context: context,

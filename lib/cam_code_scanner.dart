@@ -26,9 +26,9 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
   // Webcam widget to insert into the tree
   Widget _webcamWidget;
   Widget _imageWidget;
-
+  // The barcode result
   String barcode;
-
+  // Used to know if camera is loading or initialized
   bool initialized = false;
 
   @override
@@ -38,9 +38,10 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
     initialize();
   }
 
+  /// Calls the platform initialization and wait for result
   Future<void> initialize() async {
     int time = await channel.invokeMethod(
-      "initialize",
+      'initialize',
       [
         widget.width,
         widget.height,
@@ -61,9 +62,10 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
     _waitForResult();
   }
 
+  /// Waits for the platform completer result
   Future<void> _waitForResult() async {
     channel
-        .invokeMethod("fetchResult")
+        .invokeMethod('fetchResult')
         .then((barcode) => onBarcodeResult(barcode));
   }
 
@@ -93,7 +95,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                         height: widget.height,
                         child: _webcamWidget,
                       )
-                    : Text("loading camera..."),
+                    : Text('loading camera...'),
                 !widget.showDebugFrames
                     ? Container()
                     : SizedBox(
@@ -101,7 +103,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                         height: 100,
                         child: _imageWidget,
                       ),
-                barcode == null ? Text("Scanning barcode...") : Text(barcode),
+                barcode == null ? Text('Scanning barcode...') : Text(barcode),
               ],
             ),
           ),
