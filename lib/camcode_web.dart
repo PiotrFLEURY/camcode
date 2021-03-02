@@ -28,11 +28,11 @@ class CamcodeWeb {
 
   // Registering method
   static void registerWith(Registrar registrar) {
-    BinaryMessenger messenger = registrar;
     final channel = MethodChannel(
       'camcode',
       const StandardMethodCodec(),
-      messenger,
+      // ignore: unnecessary_cast
+      registrar as BinaryMessenger,
     );
 
     final pluginInstance = CamcodeWeb();
