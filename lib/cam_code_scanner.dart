@@ -63,7 +63,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
 
   /// Calls the platform initialization and wait for result
   Future<void> initialize() async {
-    int time = await channel.invokeMethod(
+    final time = await channel.invokeMethod(
       'initialize',
       [
         widget.width,
@@ -86,7 +86,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
   }
 
   /// Waits for the platform completer result
-  Future<void> _waitForResult() async {
+  void _waitForResult() {
     channel
         .invokeMethod('fetchResult')
         .then((barcode) => onBarcodeResult(barcode));
@@ -104,7 +104,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async {
-          channel.invokeMethod('releaseResources');
+          await channel.invokeMethod('releaseResources');
           return true;
         },
         child: Builder(

@@ -5,7 +5,7 @@ import 'dart:async';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html';
 import 'dart:js';
-import 'dart:ui' as ui;
+import 'package:camcode/dart_ui_stub/dart_ui.dart' as ui;
 
 import 'package:camcode/barcode.dart';
 import 'package:flutter/services.dart';
@@ -28,10 +28,11 @@ class CamcodeWeb {
 
   // Registering method
   static void registerWith(Registrar registrar) {
-    MethodChannel channel = MethodChannel(
+    BinaryMessenger messenger = registrar;
+    final channel = MethodChannel(
       'camcode',
       const StandardMethodCodec(),
-      registrar,
+      messenger,
     );
 
     final pluginInstance = CamcodeWeb();
@@ -138,7 +139,7 @@ class CamcodeWeb {
   /// Takes a picture of the current camera image
   /// and process it for barcode identification
   void _takePicture() async {
-    CanvasElement _canvasElement = CanvasElement(
+    final _canvasElement = CanvasElement(
         width: _webcamVideoElement.width, height: _webcamVideoElement.height);
     final context = _canvasElement.context2D;
     context.drawImageScaled(
@@ -168,7 +169,7 @@ class CamcodeWeb {
   }
 
   // Release resources to avoid leaks
-  Future<void> releaseResources() async {
+  void releaseResources() {
     _timer.cancel();
     _webcamVideoElement.pause();
     _webcamVideoElement.srcObject.getTracks().forEach((track) {
