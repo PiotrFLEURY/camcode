@@ -2,6 +2,8 @@
 
 A camera barcode scan library for Flutter Web
 
+![Web build status](https://github.com/PiotrFLEURY/camcode/actions/workflows/web.yml/badge.svg)
+
 ## Getting Started
 
 # Add a javascript file for barcode scan

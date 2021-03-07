@@ -50,7 +50,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
   // Debug frame Image widget to insert into the tree
   Widget _imageWidget;
   // The barcode result
-  String barcode;
+  String barcode = '';
   // Used to know if camera is loading or initialized
   bool initialized = false;
 
@@ -88,8 +88,8 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
   /// Waits for the platform completer result
   void _waitForResult() {
     channel
-        .invokeMethod('fetchResult')
-        .then((barcode) => onBarcodeResult(barcode));
+        .invokeMethod<String>('fetchResult')
+        .then((String barcode) => onBarcodeResult(barcode));
   }
 
   Future<void> onBarcodeResult(String _barcode) async {
@@ -109,8 +109,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
         },
         child: Builder(
           builder: (context) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Stack(
               children: <Widget>[
                 initialized
                     ? SizedBox(
@@ -118,7 +117,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                         height: widget.height,
                         child: _webcamWidget,
                       )
-                    : Text('loading camera...'),
+                    : CircularProgressIndicator(),
                 !widget.showDebugFrames
                     ? Container()
                     : SizedBox(
@@ -126,7 +125,13 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                         height: 100,
                         child: _imageWidget,
                       ),
-                barcode == null ? Text('Scanning barcode...') : Text(barcode),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(barcode),
+                  ),
+                ),
               ],
             ),
           ),

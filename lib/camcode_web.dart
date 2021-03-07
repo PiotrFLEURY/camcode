@@ -24,7 +24,7 @@ class CamcodeWeb {
   // indicates if the the scan got result or not
   bool gotResult = false;
   // used to transmit result to the Widget via MethodChannel
-  Completer completer;
+  Completer<String> completer;
 
   // Registering method
   static void registerWith(Registrar registrar) {
@@ -76,7 +76,7 @@ class CamcodeWeb {
   /// - start video streaming
   /// - start picture snapshot timer scheduling
   int initialize(double width, double height, int refreshDelayMillis) {
-    completer = Completer();
+    completer = Completer<String>();
     gotResult = false;
     // Create a video element which will be provided with stream source
     _webcamVideoElement = VideoElement()

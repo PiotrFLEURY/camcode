@@ -1,3 +1,7 @@
+## 1.0.5
+
+* Fix overflow
+
 ## 1.0.4
 
 * Add pedantic file content to analysis_options.yaml
