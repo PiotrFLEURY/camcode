@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    barcodeValue = ModalRoute.of(context).settings.arguments ??
+    barcodeValue = ModalRoute.of(context)?.settings.arguments as String? ??
         'Press button to scan a barcode';
     return MaterialApp(
       home: Scaffold(

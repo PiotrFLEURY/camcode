@@ -14,17 +14,17 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 /// A web implementation of the Camcode plugin.
 class CamcodeWeb {
   // VideoElement used to display the camera image
-  VideoElement _webcamVideoElement;
+  late VideoElement _webcamVideoElement;
   // ImageElement used to display taken pictures
-  ImageElement imageElement;
+  late ImageElement imageElement;
   // The current processing image
-  ImageData image;
+  late ImageData image;
   // timer shceduling the pictures treatment process
-  Timer _timer;
+  late Timer _timer;
   // indicates if the the scan got result or not
   bool gotResult = false;
   // used to transmit result to the Widget via MethodChannel
-  Completer<String> completer;
+  late Completer<String> completer;
 
   // Registering method
   static void registerWith(Registrar registrar) {
@@ -49,13 +49,10 @@ class CamcodeWeb {
           arguments[1],
           arguments[2],
         );
-        break;
       case 'releaseResources':
         return releaseResources();
-        break;
       case 'fetchResult':
         return fetchResult();
-        break;
       default:
         throw PlatformException(
           code: 'Unimplemented',
@@ -116,7 +113,7 @@ class CamcodeWeb {
         options = {'video': true};
       }
       window.navigator.mediaDevices
-          .getUserMedia(options)
+          ?.getUserMedia(options)
           .then((MediaStream stream) {
         _webcamVideoElement.srcObject = stream;
       });
@@ -149,14 +146,12 @@ class CamcodeWeb {
       _webcamVideoElement.width,
       _webcamVideoElement.height,
     );
-    image =
-        context.getImageData(0, 0, _canvasElement.width, _canvasElement.height);
-    if (image != null) {
-      final dataUrl = _canvasElement.toDataUrl('image/png');
-      imageElement.src = dataUrl;
+    image = context.getImageData(
+        0, 0, _canvasElement.width ?? 0, _canvasElement.height ?? 0);
+    final dataUrl = _canvasElement.toDataUrl('image/png');
+    imageElement.src = dataUrl;
 
-      detectBarcode(dataUrl, allowInterop((result) => onBarcodeResult(result)));
-    }
+    detectBarcode(dataUrl, allowInterop((result) => onBarcodeResult(result)));
   }
 
   // Method called on barcode result to finish the process and send result
@@ -172,7 +167,7 @@ class CamcodeWeb {
   void releaseResources() {
     _timer.cancel();
     _webcamVideoElement.pause();
-    _webcamVideoElement.srcObject.getTracks().forEach((track) {
+    _webcamVideoElement.srcObject?.getTracks().forEach((track) {
       track.stop();
       track.enabled = false;
     });

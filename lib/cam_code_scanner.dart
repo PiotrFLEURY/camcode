@@ -32,9 +32,9 @@ class CamCodeScanner extends StatefulWidget {
   /// * refreshDelayMillis - delay between to picture analysis
   CamCodeScanner({
     this.showDebugFrames = false,
-    @required this.onBarcodeResult,
-    @required this.width,
-    @required this.height,
+    required this.onBarcodeResult,
+    required this.width,
+    required this.height,
     this.refreshDelayMillis = 400,
   });
 
@@ -46,9 +46,9 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
   // communication channel between widget and platform code
   final MethodChannel channel = MethodChannel('camcode');
   // Webcam widget to insert into the tree
-  Widget _webcamWidget;
+  late Widget _webcamWidget;
   // Debug frame Image widget to insert into the tree
-  Widget _imageWidget;
+  late Widget _imageWidget;
   // The barcode result
   String barcode = '';
   // Used to know if camera is loading or initialized
@@ -87,9 +87,11 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
 
   /// Waits for the platform completer result
   void _waitForResult() {
-    channel
-        .invokeMethod<String>('fetchResult')
-        .then((String barcode) => onBarcodeResult(barcode));
+    channel.invokeMethod<String>('fetchResult').then((barcode) {
+      if (barcode != null) {
+        onBarcodeResult(barcode);
+      }
+    });
   }
 
   Future<void> onBarcodeResult(String _barcode) async {
