@@ -1,3 +1,8 @@
+## 2.0.1
+
+* IOS black screen fixed
+* Improve accuracy with better camera resolution
+
 ## 2.0.0
 
 * Null safety migration

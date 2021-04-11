@@ -79,7 +79,9 @@ class CamcodeWeb {
     _webcamVideoElement = VideoElement()
       ..width = width.toInt()
       ..height = height.toInt()
-      ..autoplay = true;
+      ..autoplay = true
+      ..muted = true;
+    _webcamVideoElement.setAttribute('playsinline', 'true');
 
     imageElement = ImageElement()
       ..width = 320
@@ -105,12 +107,18 @@ class CamcodeWeb {
       var options;
       if (window.navigator.userAgent.contains('Mobi')) {
         options = {
+          'audio': false,
           'video': {
-            'facingMode': {'exact': 'environment'}
+            'facingMode': {'exact': 'environment'},
+            'width': width.toInt(),
+            'height': height.toInt()
           }
         };
       } else {
-        options = {'video': true};
+        options = {
+          'audio': false,
+          'video': {'width': width.toInt(), 'height': height.toInt()}
+        };
       }
       window.navigator.mediaDevices
           ?.getUserMedia(options)
