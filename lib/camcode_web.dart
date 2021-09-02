@@ -49,6 +49,12 @@ class CamcodeWeb {
           arguments[1],
           arguments[2],
         );
+      case 'defineScanzone':
+        _scanZoneX = call.arguments.length > 0 ? call.arguments[0] : null;
+        _scanZoneY = call.arguments.length > 1 ? call.arguments[1] : null;
+        _scanZoneWidth = call.arguments.length > 2 ? call.arguments[2] : null;
+        _scanZoneHeight = call.arguments.length > 3 ? call.arguments[3] : null;
+        break;
       case 'releaseResources':
         return releaseResources();
       case 'fetchResult':
@@ -66,13 +72,22 @@ class CamcodeWeb {
     return completer.future;
   }
 
+  int? _scanZoneX;
+  int? _scanZoneY;
+  double? _scanZoneWidth;
+  double? _scanZoneHeight;
+
   /// Initialize the scanner :
   /// - request user permission
   /// - request camera stream
   /// - initialize video
   /// - start video streaming
   /// - start picture snapshot timer scheduling
-  int initialize(double width, double height, int refreshDelayMillis) {
+  int initialize(
+    double width,
+    double height,
+    int refreshDelayMillis,
+  ) {
     completer = Completer<String>();
     gotResult = false;
     // Create a video element which will be provided with stream source
@@ -134,7 +149,12 @@ class CamcodeWeb {
     Future.delayed(Duration(seconds: 1), () {
       _timer = Timer.periodic(Duration(milliseconds: refreshDelayMillis),
           (timer) async {
-        _takePicture();
+        _takePicture(
+          _scanZoneX,
+          _scanZoneY,
+          _scanZoneWidth,
+          _scanZoneHeight,
+        );
       });
     });
 
@@ -143,19 +163,31 @@ class CamcodeWeb {
 
   /// Takes a picture of the current camera image
   /// and process it for barcode identification
-  void _takePicture() async {
+  void _takePicture(
+    int? scanZoneX,
+    int? scanZoneY,
+    double? scanZoneWidth,
+    double? scanZoneHeight,
+  ) async {
     final _canvasElement = CanvasElement(
-        width: _webcamVideoElement.width, height: _webcamVideoElement.height);
+      width: _webcamVideoElement.width,
+      height: _webcamVideoElement.height,
+    );
     final context = _canvasElement.context2D;
+    // TODO: Reduce size of image allowing to detect barcodes
     context.drawImageScaled(
       _webcamVideoElement,
-      0,
-      0,
-      _webcamVideoElement.width,
-      _webcamVideoElement.height,
+      scanZoneX ?? 0,
+      scanZoneY ?? 0,
+      scanZoneWidth ?? _webcamVideoElement.width,
+      scanZoneHeight ?? _webcamVideoElement.height,
     );
     image = context.getImageData(
-        0, 0, _canvasElement.width ?? 0, _canvasElement.height ?? 0);
+      scanZoneX ?? 0,
+      scanZoneY ?? 0,
+      scanZoneWidth?.toInt() ?? _canvasElement.width ?? 0,
+      scanZoneHeight?.toInt() ?? _canvasElement.height ?? 0,
+    );
     final dataUrl = _canvasElement.toDataUrl('image/png');
     imageElement.src = dataUrl;
 

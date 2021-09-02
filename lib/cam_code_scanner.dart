@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'package:camcode/camcode_overlay.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'extensions.dart';
 
 /// Camera barcode scanner widget
 /// Asks for camera access permission
@@ -24,6 +27,23 @@ class CamCodeScanner extends StatefulWidget {
   // delay between to picture analysis
   final int refreshDelayMillis;
 
+  // Flag to indicates if camcode should show an overlay on top of the cam view
+  final bool showOverlay;
+
+  // Flag to indicates if we want to look for Barcodes/QrCodes in the entire
+  // camera video feed, or only inside the piece of image below the overlay
+  // Meaning, it reduces the dimensions if the image used for barcode analysis
+  final bool scanInsideOverlayOnly;
+
+  // Color of the cam overlay
+  final Color overlayColor;
+
+  // Overrides the default width of the overlay
+  final double overlayWidth;
+
+  // Overrides the default height of the overlay
+  final double overlayHeight;
+
   /// Camera barcode scanner widget
   /// Params:
   /// * showDebugFrames [true|false] - shows the current analysing picture
@@ -35,6 +55,11 @@ class CamCodeScanner extends StatefulWidget {
     required this.onBarcodeResult,
     required this.width,
     required this.height,
+    this.showOverlay = false,
+    this.overlayColor = Colors.black,
+    this.scanInsideOverlayOnly = false,
+    this.overlayWidth = 400,
+    this.overlayHeight = 240, // 240 is 400 * 0.6
     this.refreshDelayMillis = 400,
   });
 
@@ -53,6 +78,9 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
   String barcode = '';
   // Used to know if camera is loading or initialized
   bool initialized = false;
+
+  final _overlayKey = GlobalKey();
+  final _overlayContainerKey = GlobalKey();
 
   @override
   void initState() {
@@ -81,6 +109,23 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
     setState(() {
       initialized = true;
     });
+
+    if (SchedulerBinding.instance != null) {
+      SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
+        final bounds = _overlayKey.globalPaintBounds;
+
+        if (bounds != null) {
+          // Send the overlay size informations to the platform channel
+          // for image analysis
+          channel.invokeMethod('defineScanzone', [
+            bounds.left,
+            bounds.top,
+            bounds.width,
+            bounds.height,
+          ]);
+        }
+      });
+    }
 
     _waitForResult();
   }
@@ -111,6 +156,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
         },
         child: Builder(
           builder: (context) => Center(
+            key: _overlayContainerKey,
             child: Stack(
               children: <Widget>[
                 initialized
@@ -127,6 +173,16 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                         height: 100,
                         child: _imageWidget,
                       ),
+                if (widget.showOverlay)
+                  Align(
+                    alignment: Alignment.center,
+                    child: CamcodeOverlayPaint(
+                      key: _overlayKey,
+                      overlayColor: widget.overlayColor,
+                      width: 400,
+                      height: 400 * 0.6,
+                    ),
+                  ),
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
