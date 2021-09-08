@@ -52,6 +52,8 @@ class CamcodeWeb {
       case 'defineScanzone':
         _scanZoneWidth = call.arguments.length > 0 ? call.arguments[0] : null;
         _scanZoneHeight = call.arguments.length > 1 ? call.arguments[1] : null;
+        imageElement.width = _scanZoneWidth?.toInt() ?? imageElement.width;
+        imageElement.height = _scanZoneHeight?.toInt() ?? imageElement.height;
         break;
       case 'releaseResources':
         return releaseResources();
@@ -168,21 +170,33 @@ class CamcodeWeb {
     );
     final context = _canvasElement.context2D;
 
-    // Gets a pice of scanZoneWidth * scanZoneHeight pixels, starting from
-    // the center of the video feed
-    // Multiply the end result by a factor (3 here) to "zoom in" on those pixels
-    // while preserving the desired image ratio
-    context.drawImageScaledFromSource(
-      _webcamVideoElement,
-      (_canvasElement.width ?? 0) / 2 - (scanZoneWidth ?? 0) / 2,
-      (_canvasElement.height ?? 0) / 2 - (scanZoneHeight ?? 0) / 2,
-      scanZoneWidth ?? 0,
-      scanZoneHeight ?? 0,
-      0,
-      0,
-      (scanZoneWidth ?? 0) * 2,
-      (scanZoneHeight ?? 0) * 2,
-    );
+    if (scanZoneWidth != null && scanZoneHeight != null) {
+      // Gets a pice of scanZoneWidth * scanZoneHeight pixels, starting from
+      // the center of the video feed
+      // Multiply the end result by a factor (3 here) to "zoom in" on those pixels
+      // while preserving the desired image ratio
+      context.drawImageScaledFromSource(
+        _webcamVideoElement,
+        (_canvasElement.width ?? 0) / 2 - scanZoneWidth / 2,
+        (_canvasElement.height ?? 0) / 2 - scanZoneHeight / 2,
+        scanZoneWidth,
+        scanZoneHeight,
+        0,
+        0,
+        scanZoneWidth * 2,
+        scanZoneHeight * 2,
+      );
+    } else {
+      // If no overlay is specified, use the whole video feed as an input source
+      // for the codebar search
+      context.drawImageScaled(
+        _webcamVideoElement,
+        0,
+        0,
+        _canvasElement.width ?? 0,
+        _canvasElement.height ?? 0,
+      );
+    }
 
     image = context.getImageData(
       0,

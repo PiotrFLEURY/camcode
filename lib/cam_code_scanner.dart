@@ -111,7 +111,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
       initialized = true;
     });
 
-    if (SchedulerBinding.instance != null) {
+    if (widget.scanInsideOverlayOnly && SchedulerBinding.instance != null) {
       SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
         final bounds = _overlayKey.globalPaintBounds;
 

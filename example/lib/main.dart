@@ -46,10 +46,11 @@ class _MyAppState extends State<MyApp> {
       context: context,
       builder: (context) => CamCodeScanner(
         showDebugFrames: true,
-        showDebugOverlayAnalysisArea: true,
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        refreshDelayMillis: 800,
+        refreshDelayMillis: 100,
+        overlayWidth: 400,
+        overlayHeight: 250,
         showOverlay: true,
         scanInsideOverlayOnly: true,
         overlayColor: Colors.blue,
