@@ -15,6 +15,9 @@ class CamCodeScanner extends StatefulWidget {
   // shows the current analysing picture
   final bool showDebugFrames;
 
+  // shows the current part of the video feed being analysed for barcodes
+  final bool showDebugOverlayAnalysisArea;
+
   // call back to trigger on barcode result
   final Function onBarcodeResult;
 
@@ -52,14 +55,15 @@ class CamCodeScanner extends StatefulWidget {
   /// * refreshDelayMillis - delay between to picture analysis
   CamCodeScanner({
     this.showDebugFrames = false,
+    this.showDebugOverlayAnalysisArea = false,
     required this.onBarcodeResult,
     required this.width,
     required this.height,
     this.showOverlay = false,
     this.overlayColor = Colors.black,
     this.scanInsideOverlayOnly = false,
-    this.overlayWidth = 400,
-    this.overlayHeight = 240, // 240 is 400 * 0.6
+    this.overlayWidth = 100,
+    this.overlayHeight = 100, // 240 is 400 * 0.6
     this.refreshDelayMillis = 400,
   });
 
@@ -78,6 +82,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
   String barcode = '';
   // Used to know if camera is loading or initialized
   bool initialized = false;
+  Widget? debugOverlayAnalysisArea = null;
 
   final _overlayKey = GlobalKey();
   final _overlayContainerKey = GlobalKey();
@@ -123,6 +128,22 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
             bounds.width,
             bounds.height,
           ]);
+
+          if (widget.showDebugOverlayAnalysisArea) {
+            setState(() {
+              debugOverlayAnalysisArea = Positioned.fromRect(
+                rect: bounds,
+                child: Opacity(
+                  opacity: 0.2,
+                  child: Container(
+                    width: bounds.width + 20,
+                    height: bounds.height + 20,
+                    color: Colors.black,
+                  ),
+                ),
+              );
+            });
+          }
         }
       });
     }
@@ -183,6 +204,10 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                       height: 400 * 0.6,
                     ),
                   ),
+                if (widget.showOverlay &&
+                    widget.showDebugOverlayAnalysisArea &&
+                    debugOverlayAnalysisArea != null)
+                  debugOverlayAnalysisArea!,
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(

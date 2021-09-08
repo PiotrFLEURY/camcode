@@ -99,8 +99,9 @@ class CamcodeWeb {
     _webcamVideoElement.setAttribute('playsinline', 'true');
 
     imageElement = ImageElement()
-      ..width = 320
-      ..height = 320;
+      ..width = 500
+      ..height = 320
+      ..className = 'imgPreview';
 
     // Register an webcam
 
@@ -174,20 +175,26 @@ class CamcodeWeb {
       height: _webcamVideoElement.height,
     );
     final context = _canvasElement.context2D;
-    // TODO: Reduce size of image allowing to detect barcodes
-    context.drawImageScaled(
+
+    context.drawImageScaledFromSource(
       _webcamVideoElement,
-      scanZoneX ?? 0,
-      scanZoneY ?? 0,
-      scanZoneWidth ?? _webcamVideoElement.width,
-      scanZoneHeight ?? _webcamVideoElement.height,
+      150,
+      150,
+      scanZoneWidth?.toInt() ?? 0,
+      scanZoneHeight?.toInt() ?? 0,
+      0,
+      0,
+      (_canvasElement.width ?? 0),
+      (_canvasElement.height ?? 0),
     );
+
     image = context.getImageData(
-      scanZoneX ?? 0,
-      scanZoneY ?? 0,
-      scanZoneWidth?.toInt() ?? _canvasElement.width ?? 0,
-      scanZoneHeight?.toInt() ?? _canvasElement.height ?? 0,
+      0,
+      0,
+      _canvasElement.width ?? 0,
+      _canvasElement.height ?? 0,
     );
+
     final dataUrl = _canvasElement.toDataUrl('image/png');
     imageElement.src = dataUrl;
 

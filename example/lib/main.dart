@@ -45,10 +45,13 @@ class _MyAppState extends State<MyApp> {
     showDialog(
       context: context,
       builder: (context) => CamCodeScanner(
+        showDebugFrames: true,
+        showDebugOverlayAnalysisArea: true,
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        refreshDelayMillis: 100,
+        refreshDelayMillis: 800,
         showOverlay: true,
+        scanInsideOverlayOnly: true,
         overlayColor: Colors.blue,
         onBarcodeResult: (barcode) {
           Navigator.of(context).pushNamed('/', arguments: barcode);
