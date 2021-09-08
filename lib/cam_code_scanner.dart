@@ -136,8 +136,8 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                 child: Opacity(
                   opacity: 0.2,
                   child: Container(
-                    width: bounds.width + 20,
-                    height: bounds.height + 20,
+                    width: bounds.width,
+                    height: bounds.height,
                     color: Colors.black,
                   ),
                 ),
