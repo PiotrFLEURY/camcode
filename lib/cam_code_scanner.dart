@@ -15,9 +15,6 @@ class CamCodeScanner extends StatefulWidget {
   // shows the current analysing picture
   final bool showDebugFrames;
 
-  // shows the current part of the video feed being analysed for barcodes
-  final bool showDebugOverlayAnalysisArea;
-
   // call back to trigger on barcode result
   final Function onBarcodeResult;
 
@@ -55,7 +52,6 @@ class CamCodeScanner extends StatefulWidget {
   /// * refreshDelayMillis - delay between to picture analysis
   CamCodeScanner({
     this.showDebugFrames = false,
-    this.showDebugOverlayAnalysisArea = false,
     required this.onBarcodeResult,
     required this.width,
     required this.height,
@@ -123,27 +119,9 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
           // Send the overlay size informations to the platform channel
           // for image analysis
           channel.invokeMethod('defineScanzone', [
-            bounds.left,
-            bounds.top,
             bounds.width,
             bounds.height,
           ]);
-
-          if (widget.showDebugOverlayAnalysisArea) {
-            setState(() {
-              debugOverlayAnalysisArea = Positioned.fromRect(
-                rect: bounds,
-                child: Opacity(
-                  opacity: 0.2,
-                  child: Container(
-                    width: bounds.width,
-                    height: bounds.height,
-                    color: Colors.black,
-                  ),
-                ),
-              );
-            });
-          }
         }
       });
     }
@@ -197,17 +175,25 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                 if (widget.showOverlay)
                   Align(
                     alignment: Alignment.center,
-                    child: CamcodeOverlayPaint(
-                      key: _overlayKey,
-                      overlayColor: widget.overlayColor,
-                      width: widget.overlayWidth,
-                      height: widget.overlayHeight,
+                    child: Stack(
+                      children: [
+                        CamcodeOverlayPaint(
+                          key: _overlayKey,
+                          overlayColor: widget.overlayColor,
+                          width: widget.overlayWidth,
+                          height: widget.overlayHeight,
+                        ),
+                        Opacity(
+                          opacity: 0.2,
+                          child: Container(
+                            width: widget.overlayWidth,
+                            height: widget.overlayHeight,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                if (widget.showOverlay &&
-                    widget.showDebugOverlayAnalysisArea &&
-                    debugOverlayAnalysisArea != null)
-                  debugOverlayAnalysisArea!,
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(

@@ -50,10 +50,8 @@ class CamcodeWeb {
           arguments[2],
         );
       case 'defineScanzone':
-        _scanZoneX = call.arguments.length > 0 ? call.arguments[0] : null;
-        _scanZoneY = call.arguments.length > 1 ? call.arguments[1] : null;
-        _scanZoneWidth = call.arguments.length > 2 ? call.arguments[2] : null;
-        _scanZoneHeight = call.arguments.length > 3 ? call.arguments[3] : null;
+        _scanZoneWidth = call.arguments.length > 0 ? call.arguments[0] : null;
+        _scanZoneHeight = call.arguments.length > 1 ? call.arguments[1] : null;
         break;
       case 'releaseResources':
         return releaseResources();
@@ -72,8 +70,6 @@ class CamcodeWeb {
     return completer.future;
   }
 
-  int? _scanZoneX;
-  int? _scanZoneY;
   double? _scanZoneWidth;
   double? _scanZoneHeight;
 
@@ -151,8 +147,6 @@ class CamcodeWeb {
       _timer = Timer.periodic(Duration(milliseconds: refreshDelayMillis),
           (timer) async {
         _takePicture(
-          _scanZoneX,
-          _scanZoneY,
           _scanZoneWidth,
           _scanZoneHeight,
         );
@@ -165,8 +159,6 @@ class CamcodeWeb {
   /// Takes a picture of the current camera image
   /// and process it for barcode identification
   void _takePicture(
-    int? scanZoneX,
-    int? scanZoneY,
     double? scanZoneWidth,
     double? scanZoneHeight,
   ) async {
@@ -176,29 +168,21 @@ class CamcodeWeb {
     );
     final context = _canvasElement.context2D;
 
+    // Gets a pice of scanZoneWidth * scanZoneHeight pixels, starting from
+    // the center of the video feed
+    // Multiply the end result by a factor (3 here) to "zoom in" on those pixels
+    // while preserving the desired image ratio
     context.drawImageScaledFromSource(
       _webcamVideoElement,
+      (_canvasElement.width ?? 0) / 2 - (scanZoneWidth ?? 0) / 2,
+      (_canvasElement.height ?? 0) / 2 - (scanZoneHeight ?? 0) / 2,
+      scanZoneWidth ?? 0,
+      scanZoneHeight ?? 0,
       0,
       0,
-      (_canvasElement.width ?? 0),
-      (_canvasElement.height ?? 0),
-      0,
-      0,
-      (_canvasElement.width ?? 0),
-      (_canvasElement.height ?? 0),
+      (scanZoneWidth ?? 0) * 2,
+      (scanZoneHeight ?? 0) * 2,
     );
-
-    // context.drawImageScaledFromSource(
-    //   _webcamVideoElement,
-    //   150,
-    //   150,
-    //   scanZoneWidth?.toInt() ?? 0,
-    //   scanZoneHeight?.toInt() ?? 0,
-    //   0,
-    //   0,
-    //   (_canvasElement.width ?? 0),
-    //   (_canvasElement.height ?? 0),
-    // );
 
     image = context.getImageData(
       0,
