@@ -62,8 +62,8 @@ class CamCodeScanner extends StatefulWidget {
     this.showOverlay = false,
     this.overlayColor = Colors.black,
     this.scanInsideOverlayOnly = false,
-    this.overlayWidth = 100,
-    this.overlayHeight = 100, // 240 is 400 * 0.6
+    this.overlayWidth = 400,
+    this.overlayHeight = 240, // 240 is 400 * 0.6
     this.refreshDelayMillis = 400,
   });
 
@@ -82,7 +82,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
   String barcode = '';
   // Used to know if camera is loading or initialized
   bool initialized = false;
-  Widget? debugOverlayAnalysisArea = null;
+  Widget? debugOverlayAnalysisArea;
 
   final _overlayKey = GlobalKey();
   final _overlayContainerKey = GlobalKey();
@@ -190,8 +190,8 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                 !widget.showDebugFrames
                     ? Container()
                     : SizedBox(
-                        width: 100,
                         height: 100,
+                        width: 100,
                         child: _imageWidget,
                       ),
                 if (widget.showOverlay)
@@ -200,8 +200,8 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                     child: CamcodeOverlayPaint(
                       key: _overlayKey,
                       overlayColor: widget.overlayColor,
-                      width: 400,
-                      height: 400 * 0.6,
+                      width: widget.overlayWidth,
+                      height: widget.overlayHeight,
                     ),
                   ),
                 if (widget.showOverlay &&

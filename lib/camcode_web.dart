@@ -99,8 +99,8 @@ class CamcodeWeb {
     _webcamVideoElement.setAttribute('playsinline', 'true');
 
     imageElement = ImageElement()
-      ..width = 500
-      ..height = 320
+      ..width = 300
+      ..height = 300
       ..className = 'imgPreview';
 
     // Register an webcam
@@ -171,22 +171,34 @@ class CamcodeWeb {
     double? scanZoneHeight,
   ) async {
     final _canvasElement = CanvasElement(
-      width: _webcamVideoElement.width,
-      height: _webcamVideoElement.height,
+      width: _webcamVideoElement.videoWidth,
+      height: _webcamVideoElement.videoHeight,
     );
     final context = _canvasElement.context2D;
 
     context.drawImageScaledFromSource(
       _webcamVideoElement,
-      150,
-      150,
-      scanZoneWidth?.toInt() ?? 0,
-      scanZoneHeight?.toInt() ?? 0,
+      0,
+      0,
+      (_canvasElement.width ?? 0),
+      (_canvasElement.height ?? 0),
       0,
       0,
       (_canvasElement.width ?? 0),
       (_canvasElement.height ?? 0),
     );
+
+    // context.drawImageScaledFromSource(
+    //   _webcamVideoElement,
+    //   150,
+    //   150,
+    //   scanZoneWidth?.toInt() ?? 0,
+    //   scanZoneHeight?.toInt() ?? 0,
+    //   0,
+    //   0,
+    //   (_canvasElement.width ?? 0),
+    //   (_canvasElement.height ?? 0),
+    // );
 
     image = context.getImageData(
       0,
