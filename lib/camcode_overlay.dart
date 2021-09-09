@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class CamcodeOverlay extends StatelessWidget {
-  CamcodeOverlay(
-      {Key? key,
-      this.width = 400,
-      this.height = -1,
-      this.overlayColor = Colors.black,
-      this.animationDuration = -1})
-      : super(key: key) {
+  CamcodeOverlay({
+    Key? key,
+    this.width = 400,
+    this.height = -1,
+    this.overlayColor = Colors.black,
+    this.animationDuration = -1,
+  }) : super(key: key) {
     if (height < 0) {
       height = width * 0.6;
     }
@@ -62,18 +62,12 @@ class _AnimatedScannerBar extends StatefulWidget {
 }
 
 class __AnimatedScannerBarState extends State<_AnimatedScannerBar>
-    with TickerProviderStateMixin {
-  late AnimationController widthController;
-  late Animation<double> widthAnimation;
-
+    with SingleTickerProviderStateMixin {
   late AnimationController positionController;
   late Animation<double> positionAnimation;
 
   @override
   void dispose() {
-    widthController.stop();
-    widthController.dispose();
-
     positionController.stop();
     positionController.dispose();
 
@@ -84,36 +78,25 @@ class __AnimatedScannerBarState extends State<_AnimatedScannerBar>
   void initState() {
     super.initState();
 
-    _setupWidthAnimation();
     _setupHeightAnimation();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
+    return AnimatedBuilder(
+      animation: positionController,
       child: Container(
         height: 2,
         color: widget.color,
         width: widget.maxWidth,
       ),
-      left: 0,
-      top: positionAnimation.value,
+      builder: (context, child) {
+        return Positioned(
+          child: child!,
+          top: positionAnimation.value,
+        );
+      },
     );
-  }
-
-  void _setupWidthAnimation() {
-    widthController = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: widget.animationDuration),
-    );
-    widthAnimation = Tween<double>(
-      begin: widget.maxWidth / 4,
-      end: widget.maxWidth,
-    ).animate(widthController);
-    widthController.addListener(() {
-      setState(() {});
-    });
-    // widthController.repeat(reverse: true);
   }
 
   void _setupHeightAnimation() {
@@ -125,9 +108,6 @@ class __AnimatedScannerBarState extends State<_AnimatedScannerBar>
       begin: 0,
       end: widget.maxHeight,
     ).animate(positionController);
-    positionController.addListener(() {
-      setState(() {});
-    });
     positionController.repeat(reverse: true);
   }
 }

@@ -51,6 +51,7 @@ class _MyAppState extends State<MyApp> {
         refreshDelayMillis: 100,
         overlayWidth: 400,
         overlayHeight: 250,
+        overlayAnimationDuration: 800,
         showOverlay: true,
         scanInsideOverlayOnly: true,
         overlayColor: Colors.blue,

@@ -44,6 +44,10 @@ class CamCodeScanner extends StatefulWidget {
   // Overrides the default height of the overlay
   final double overlayHeight;
 
+  // Animation duration for the scan overlay, in milliseconds.
+  // Defaults to -1, which indicates no animation.
+  final int overlayAnimationDuration;
+
   /// Camera barcode scanner widget
   /// Params:
   /// * showDebugFrames [true|false] - shows the current analysing picture
@@ -61,6 +65,7 @@ class CamCodeScanner extends StatefulWidget {
     this.overlayWidth = 400,
     this.overlayHeight = 240, // 240 is 400 * 0.6
     this.refreshDelayMillis = 400,
+    this.overlayAnimationDuration = -1,
   });
 
   @override
@@ -182,6 +187,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                           overlayColor: widget.overlayColor,
                           width: widget.overlayWidth,
                           height: widget.overlayHeight,
+                          animationDuration: widget.overlayAnimationDuration,
                         ),
                         Opacity(
                           opacity: 0.2,
