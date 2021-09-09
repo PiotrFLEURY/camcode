@@ -201,8 +201,8 @@ class CamcodeWeb {
     image = context.getImageData(
       0,
       0,
-      _canvasElement.width ?? 0,
-      _canvasElement.height ?? 0,
+      _webcamVideoElement.width,
+      _webcamVideoElement.height,
     );
 
     final dataUrl = _canvasElement.toDataUrl('image/png');
