@@ -177,7 +177,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                     alignment: Alignment.center,
                     child: Stack(
                       children: [
-                        CamcodeOverlayPaint(
+                        CamcodeOverlay(
                           key: _overlayKey,
                           overlayColor: widget.overlayColor,
                           width: widget.overlayWidth,

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-class CamcodeOverlayPaint extends StatelessWidget {
-  CamcodeOverlayPaint({
-    Key? key,
-    this.width = 400,
-    this.height = -1,
-    this.overlayColor = Colors.black,
-  }) : super(key: key) {
+class CamcodeOverlay extends StatelessWidget {
+  CamcodeOverlay(
+      {Key? key,
+      this.width = 400,
+      this.height = -1,
+      this.overlayColor = Colors.black,
+      this.animationDuration = -1})
+      : super(key: key) {
     if (height < 0) {
       height = width * 0.6;
     }
@@ -14,19 +15,120 @@ class CamcodeOverlayPaint extends StatelessWidget {
 
   final Color overlayColor;
   final double width;
+  final int animationDuration;
   late double height;
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: Size(
-        width,
-        height,
-      ),
-      painter: _RPSCustomPainter(
-        overlayColor: overlayColor,
-      ),
+    return Stack(
+      children: [
+        CustomPaint(
+          size: Size(
+            width,
+            height,
+          ),
+          painter: _RPSCustomPainter(
+            overlayColor: overlayColor,
+          ),
+        ),
+        if (animationDuration > 0)
+          _AnimatedScannerBar(
+            color: overlayColor,
+            maxWidth: width,
+            maxHeight: height,
+            animationDuration: animationDuration,
+          ),
+      ],
     );
+  }
+}
+
+class _AnimatedScannerBar extends StatefulWidget {
+  _AnimatedScannerBar({
+    Key? key,
+    required this.color,
+    required this.maxWidth,
+    required this.maxHeight,
+    this.animationDuration = 800,
+  }) : super(key: key);
+
+  final Color color;
+  final double maxWidth;
+  final double maxHeight;
+  final int animationDuration;
+
+  @override
+  __AnimatedScannerBarState createState() => __AnimatedScannerBarState();
+}
+
+class __AnimatedScannerBarState extends State<_AnimatedScannerBar>
+    with TickerProviderStateMixin {
+  late AnimationController widthController;
+  late Animation<double> widthAnimation;
+
+  late AnimationController positionController;
+  late Animation<double> positionAnimation;
+
+  @override
+  void dispose() {
+    widthController.stop();
+    widthController.dispose();
+
+    positionController.stop();
+    positionController.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _setupWidthAnimation();
+    _setupHeightAnimation();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      child: Container(
+        height: 2,
+        color: widget.color,
+        width: widget.maxWidth,
+      ),
+      left: 0,
+      top: positionAnimation.value,
+    );
+  }
+
+  void _setupWidthAnimation() {
+    widthController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: widget.animationDuration),
+    );
+    widthAnimation = Tween<double>(
+      begin: widget.maxWidth / 4,
+      end: widget.maxWidth,
+    ).animate(widthController);
+    widthController.addListener(() {
+      setState(() {});
+    });
+    // widthController.repeat(reverse: true);
+  }
+
+  void _setupHeightAnimation() {
+    positionController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: widget.animationDuration * 2),
+    );
+    positionAnimation = Tween<double>(
+      begin: 0,
+      end: widget.maxHeight,
+    ).animate(positionController);
+    positionController.addListener(() {
+      setState(() {});
+    });
+    positionController.repeat(reverse: true);
   }
 }
 
@@ -39,57 +141,60 @@ class _RPSCustomPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint_0 = Paint()
+    final upperLeftPaint = Paint()
       ..color = overlayColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5.03;
 
-    final path_0 = Path();
-    path_0.moveTo(size.width * 0.1920286, size.height * 0.0137500);
-    path_0.lineTo(size.width * 0.0078000, size.height * 0.0121500);
-    path_0.lineTo(size.width * 0.0077429, size.height * 0.3374500);
+    final upperLeftPath = Path()
+      ..moveTo(size.width * 0.1920286, size.height * 0.0137500)
+      ..lineTo(size.width * 0.0078000, size.height * 0.0121500)
+      ..lineTo(size.width * 0.0077429, size.height * 0.3374500);
 
-    canvas.drawPath(path_0, paint_0);
+    canvas.drawPath(upperLeftPath, upperLeftPaint);
 
-    final paint_1 = Paint()
+    final upperRightPaint = Paint()
       ..color = overlayColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5.03;
 
-    final path_1 = Path();
-    path_1.moveTo(size.width * 0.9879143, size.height * 0.6623500);
-    path_1.lineTo(size.width * 0.9885714, size.height * 0.9800000);
-    path_1.lineTo(size.width * 0.8041143, size.height * 0.9811500);
+    final upperRightPath = Path()
+      ..moveTo(size.width * 0.9879143, size.height * 0.6623500)
+      ..lineTo(size.width * 0.9885714, size.height * 0.9800000)
+      ..lineTo(size.width * 0.8041143, size.height * 0.9811500);
 
-    canvas.drawPath(path_1, paint_1);
+    canvas.drawPath(upperRightPath, upperRightPaint);
 
-    final paint_2 = Paint()
+    final lowerRightPaint = Paint()
       ..color = overlayColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5.03;
 
-    final path_2 = Path();
-    path_2.moveTo(size.width * 0.1907429, size.height * 0.9818000);
-    path_2.lineTo(size.width * 0.0085714, size.height * 0.9800000);
-    path_2.lineTo(size.width * 0.0085714, size.height * 0.6650000);
+    final lowerRightPath = Path()
+      ..moveTo(size.width * 0.1907429, size.height * 0.9818000)
+      ..lineTo(size.width * 0.0085714, size.height * 0.9800000)
+      ..lineTo(size.width * 0.0085714, size.height * 0.6650000);
 
-    canvas.drawPath(path_2, paint_2);
+    canvas.drawPath(lowerRightPath, lowerRightPaint);
 
-    final paint_3 = Paint()
+    final lowerLeftPaint = Paint()
       ..color = overlayColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5.03;
 
-    final path_3 = Path();
-    path_3.moveTo(size.width * 0.8091143, size.height * 0.0086500);
-    path_3.lineTo(size.width * 0.9887143, size.height * 0.0087000);
-    path_3.lineTo(size.width * 0.9878000, size.height * 0.3380000);
+    final lowerLeftPath = Path()
+      ..moveTo(size.width * 0.8091143, size.height * 0.0086500)
+      ..lineTo(size.width * 0.9887143, size.height * 0.0087000)
+      ..lineTo(size.width * 0.9878000, size.height * 0.3380000);
 
-    canvas.drawPath(path_3, paint_3);
+    canvas.drawPath(lowerLeftPath, lowerLeftPaint);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return overlayColor != (oldDelegate as _RPSCustomPainter).overlayColor;
+    final shouldRepaint =
+        overlayColor != (oldDelegate as _RPSCustomPainter).overlayColor;
+
+    return shouldRepaint;
   }
 }
