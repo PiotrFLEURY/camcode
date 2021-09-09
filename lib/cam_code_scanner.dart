@@ -86,7 +86,6 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
   Widget? debugOverlayAnalysisArea;
 
   final _overlayKey = GlobalKey();
-  final _overlayContainerKey = GlobalKey();
 
   @override
   void initState() {
@@ -160,7 +159,6 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
         },
         child: Builder(
           builder: (context) => Center(
-            key: _overlayContainerKey,
             child: Stack(
               children: <Widget>[
                 initialized
@@ -180,24 +178,12 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                 if (widget.showOverlay)
                   Align(
                     alignment: Alignment.center,
-                    child: Stack(
-                      children: [
-                        CamcodeOverlay(
-                          key: _overlayKey,
-                          overlayColor: widget.overlayColor,
-                          width: widget.overlayWidth,
-                          height: widget.overlayHeight,
-                          animationDuration: widget.overlayAnimationDuration,
-                        ),
-                        Opacity(
-                          opacity: 0.2,
-                          child: Container(
-                            width: widget.overlayWidth,
-                            height: widget.overlayHeight,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
+                    child: CamcodeOverlay(
+                      key: _overlayKey,
+                      overlayColor: widget.overlayColor,
+                      width: widget.overlayWidth,
+                      height: widget.overlayHeight,
+                      animationDuration: widget.overlayAnimationDuration,
                     ),
                   ),
                 Align(

@@ -22,15 +22,17 @@ class CamcodeOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // Custom path square to define scanning zone
         CustomPaint(
           size: Size(
             width,
             height,
           ),
-          painter: _RPSCustomPainter(
+          painter: _ScannerCustomPainter(
             overlayColor: overlayColor,
           ),
         ),
+        // Animated line
         if (animationDuration > 0)
           _AnimatedScannerBar(
             color: overlayColor,
@@ -38,6 +40,15 @@ class CamcodeOverlay extends StatelessWidget {
             maxHeight: height,
             animationDuration: animationDuration,
           ),
+        // Black transparent background for the scaning zone
+        Opacity(
+          opacity: 0.2,
+          child: Container(
+            width: width,
+            height: height,
+            color: Colors.black,
+          ),
+        ),
       ],
     );
   }
@@ -112,68 +123,58 @@ class __AnimatedScannerBarState extends State<_AnimatedScannerBar>
   }
 }
 
-class _RPSCustomPainter extends CustomPainter {
+class _ScannerCustomPainter extends CustomPainter {
   final Color overlayColor;
 
-  _RPSCustomPainter({
+  _ScannerCustomPainter({
     required this.overlayColor,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final upperLeftPaint = Paint()
+    final strokeWidth = 5.0;
+
+    // Most of the code here was generated using the online tool here:
+    // https://shapemaker.web.app/#/
+    // Then it was refactored for code clarity
+    final painter = Paint()
       ..color = overlayColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5.03;
+      ..strokeWidth = strokeWidth;
 
     final upperLeftPath = Path()
       ..moveTo(size.width * 0.1920286, size.height * 0.0137500)
       ..lineTo(size.width * 0.0078000, size.height * 0.0121500)
       ..lineTo(size.width * 0.0077429, size.height * 0.3374500);
 
-    canvas.drawPath(upperLeftPath, upperLeftPaint);
-
-    final upperRightPaint = Paint()
-      ..color = overlayColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 5.03;
+    canvas.drawPath(upperLeftPath, painter);
 
     final upperRightPath = Path()
       ..moveTo(size.width * 0.9879143, size.height * 0.6623500)
       ..lineTo(size.width * 0.9885714, size.height * 0.9800000)
       ..lineTo(size.width * 0.8041143, size.height * 0.9811500);
 
-    canvas.drawPath(upperRightPath, upperRightPaint);
-
-    final lowerRightPaint = Paint()
-      ..color = overlayColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 5.03;
+    canvas.drawPath(upperRightPath, painter);
 
     final lowerRightPath = Path()
       ..moveTo(size.width * 0.1907429, size.height * 0.9818000)
       ..lineTo(size.width * 0.0085714, size.height * 0.9800000)
       ..lineTo(size.width * 0.0085714, size.height * 0.6650000);
 
-    canvas.drawPath(lowerRightPath, lowerRightPaint);
-
-    final lowerLeftPaint = Paint()
-      ..color = overlayColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 5.03;
+    canvas.drawPath(lowerRightPath, painter);
 
     final lowerLeftPath = Path()
       ..moveTo(size.width * 0.8091143, size.height * 0.0086500)
       ..lineTo(size.width * 0.9887143, size.height * 0.0087000)
       ..lineTo(size.width * 0.9878000, size.height * 0.3380000);
 
-    canvas.drawPath(lowerLeftPath, lowerLeftPaint);
+    canvas.drawPath(lowerLeftPath, painter);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     final shouldRepaint =
-        overlayColor != (oldDelegate as _RPSCustomPainter).overlayColor;
+        overlayColor != (oldDelegate as _ScannerCustomPainter).overlayColor;
 
     return shouldRepaint;
   }
