@@ -4,9 +4,9 @@ A camera barcode scan library for Flutter Web
 
 ![Web build status](https://github.com/PiotrFLEURY/camcode/actions/workflows/web.yml/badge.svg)
 
-## Getting Started
+# Getting Started
 
-# Add a javascript file for barcode scan
+## Add a javascript file for barcode scan
 
 ```
 function detectBarcode(dataUrl, callback) {
@@ -20,14 +20,14 @@ function detectBarcode(dataUrl, callback) {
 }
 ```
 
-# Import javascript files into your index.html
+## Import javascript files into your index.html
 
 ```
 <script src="LINK_TO_MY_AWESOME_JAVASCRIPT_BARCODE_SCAN_LIB"></script>
 <script src="js/barcode.js"></script> // the javascript file with the detectBarcode function
 ```
 
-# Use it
+## Use it
 
 ```
 import 'package:camcode/cam_code_scanner.dart';
@@ -44,3 +44,43 @@ showDialog(
     ),
 );
 ```
+
+# More options
+
+## Manually release resources
+
+Sometimes, depending on your camcode usage, you may need to release resources manually.
+
+1- To do so, create first a controller for the scanner
+
+```dart
+// Create a controller to send instructions to scanner
+  final CamCodeScannerController _controller = CamCodeScannerController();
+```
+
+2- Then, add it to the `CamCodeScanner`
+
+```dart
+CamCodeScanner(
+    width: ...,
+    height: ...,
+    refreshDelayMillis: ...,
+    onBarcodeResult: (barcode) {
+        ...
+    },
+    controller: _controller,
+),
+```
+
+3- And finally, just call `releaseResources()` method when required
+
+```dart
+ElevatedButton(
+    onPressed: () {
+        _controller.releaseResources();
+    },
+    child: Text('Release resources'),
+),
+```
+
+> Calling this method will close the camera and stop the scanner process

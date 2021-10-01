@@ -24,6 +24,9 @@ class CamCodeScanner extends StatefulWidget {
   // delay between to picture analysis
   final int refreshDelayMillis;
 
+  // controller to control the camera from outside
+  final CamCodeScannerController? controller;
+
   /// Camera barcode scanner widget
   /// Params:
   /// * showDebugFrames [true|false] - shows the current analysing picture
@@ -36,6 +39,7 @@ class CamCodeScanner extends StatefulWidget {
     required this.width,
     required this.height,
     this.refreshDelayMillis = 400,
+    this.controller,
   });
 
   @override
@@ -63,6 +67,8 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
 
   /// Calls the platform initialization and wait for result
   Future<void> initialize() async {
+    widget.controller?._channel = channel;
+
     final time = await channel.invokeMethod(
       'initialize',
       [
@@ -139,6 +145,19 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Controller to control the camera from outside
+class CamCodeScannerController {
+  // Channel to communicate with the platform code
+  late MethodChannel _channel;
+
+  // Invoke this method to close the camera and release all resources
+  Future<void> releaseResources() async {
+    return _channel.invokeMethod(
+      'releaseResources',
     );
   }
 }
