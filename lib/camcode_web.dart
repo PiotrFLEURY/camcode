@@ -5,6 +5,7 @@ import 'dart:async';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html';
 import 'dart:js';
+import 'package:camcode/barcode_results.dart';
 import 'package:camcode/dart_ui_stub/dart_ui.dart' as ui;
 
 import 'package:camcode/barcode.dart';
@@ -17,14 +18,14 @@ class CamcodeWeb {
   late VideoElement _webcamVideoElement;
   // ImageElement used to display taken pictures
   late ImageElement imageElement;
-  // The current processing image
-  late ImageData image;
   // timer shceduling the pictures treatment process
   late Timer _timer;
-  // indicates if the the scan got result or not
-  bool gotResult = false;
   // used to transmit result to the Widget via MethodChannel
   late Completer<String> completer;
+  // bacode results container
+  final BarcodeResults _barcodeResults = BarcodeResults();
+  // Canvas elements used to draw the barcode result
+  late CanvasElement _canvasElement;
 
   // Registering method
   static void registerWith(Registrar registrar) {
@@ -74,7 +75,7 @@ class CamcodeWeb {
   /// - start picture snapshot timer scheduling
   int initialize(double width, double height, int refreshDelayMillis) {
     completer = Completer<String>();
-    gotResult = false;
+    _barcodeResults.clear();
     // Create a video element which will be provided with stream source
     _webcamVideoElement = VideoElement()
       ..width = width.toInt()
@@ -124,28 +125,45 @@ class CamcodeWeb {
           ?.getUserMedia(options)
           .then((MediaStream stream) {
         _webcamVideoElement.srcObject = stream;
+        initCanvas();
       });
     } else {
       window.navigator.getUserMedia(video: true).then((MediaStream stream) {
         _webcamVideoElement.srcObject = stream;
+        initCanvas();
       });
     }
 
     Future.delayed(Duration(seconds: 1), () {
-      _timer = Timer.periodic(Duration(milliseconds: refreshDelayMillis),
-          (timer) async {
-        _takePicture();
-      });
+      _scan(refreshDelayMillis);
     });
 
     return time;
   }
 
+  // Initialize the canvas element used to draw the barcode result
+  void initCanvas() {
+    _canvasElement = CanvasElement(
+      width: _webcamVideoElement.width,
+      height: _webcamVideoElement.height,
+    );
+  }
+
+  // Scan loop
+  Future<void> _scan(int refreshDelayMillis) async {
+    _timer = Timer.periodic(
+      Duration(
+        milliseconds: refreshDelayMillis,
+      ),
+      (timer) {
+        _takePicture();
+      },
+    );
+  }
+
   /// Takes a picture of the current camera image
   /// and process it for barcode identification
-  void _takePicture() async {
-    final _canvasElement = CanvasElement(
-        width: _webcamVideoElement.width, height: _webcamVideoElement.height);
+  Future<void> _takePicture() async {
     final context = _canvasElement.context2D;
     context.drawImageScaled(
       _webcamVideoElement,
@@ -154,8 +172,6 @@ class CamcodeWeb {
       _webcamVideoElement.width,
       _webcamVideoElement.height,
     );
-    image = context.getImageData(
-        0, 0, _canvasElement.width ?? 0, _canvasElement.height ?? 0);
     final dataUrl = _canvasElement.toDataUrl('image/png');
     imageElement.src = dataUrl;
 
@@ -164,10 +180,13 @@ class CamcodeWeb {
 
   // Method called on barcode result to finish the process and send result
   Future<void> onBarcodeResult(String _barcode) async {
-    if (!gotResult) {
-      gotResult = true;
+    _barcodeResults.add(_barcode);
+    if (_barcodeResults.gotResult) {
       releaseResources();
-      completer.complete(_barcode);
+      if (!completer.isCompleted) {
+        completer.complete(_barcodeResults.mostFrequentBarcode);
+        _barcodeResults.clear();
+      }
     }
   }
 
@@ -180,5 +199,8 @@ class CamcodeWeb {
       track.enabled = false;
     });
     _webcamVideoElement.srcObject = null;
+    _canvasElement.remove();
+    _webcamVideoElement.remove();
+    imageElement.remove();
   }
 }
