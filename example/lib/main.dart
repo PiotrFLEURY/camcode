@@ -25,14 +25,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    barcodeValue = ModalRoute.of(context)?.settings.arguments as String? ??
-        'Press button to scan a barcode';
     return MaterialApp(
       home: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.scanner),
-          onPressed: () => openScanner(context),
+          onPressed: () => openScanner(context, _onResult),
         ),
         appBar: AppBar(
           title: const Text('CamCode example app'),
@@ -44,7 +42,13 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void openScanner(BuildContext context) {
+  void _onResult(String result) {
+    setState(() {
+      barcodeValue = result;
+    });
+  }
+
+  void openScanner(BuildContext context, Function(String) onResult) {
     showDialog(
       context: context,
       builder: (context) => Stack(
@@ -52,11 +56,13 @@ class _MyAppState extends State<MyApp> {
           CamCodeScanner(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            refreshDelayMillis: 800,
+            refreshDelayMillis: 200,
             onBarcodeResult: (barcode) {
-              Navigator.of(context).pushNamed('/', arguments: barcode);
+              Navigator.of(context).pop();
+              onResult(barcode);
             },
             controller: _controller,
+            showDebugFrames: true,
           ),
           Positioned(
             bottom: 48.0,

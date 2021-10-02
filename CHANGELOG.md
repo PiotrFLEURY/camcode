@@ -1,6 +1,7 @@
 ## 2.1.0
 
 - Add releaseResources method
+- Improve scan reliability using multiple results instead of one
 
 ## 2.0.1
 

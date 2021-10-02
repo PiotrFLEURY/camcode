@@ -65,6 +65,14 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
     initialize();
   }
 
+  @override
+  void dispose() {
+    channel.invokeMethod(
+      'releaseResources',
+    );
+    super.dispose();
+  }
+
   /// Calls the platform initialization and wait for result
   Future<void> initialize() async {
     widget.controller?._channel = channel;
