@@ -1,3 +1,8 @@
+## 2.2.0
+
+- Add camera selection option
+- Add point of interest
+
 ## 2.1.0
 
 - Add releaseResources method

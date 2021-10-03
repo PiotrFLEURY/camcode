@@ -20,9 +20,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String barcodeValue = 'Press button to scan a barcode';
 
-  // Create a controller to send instructions to scanner
-  final CamCodeScannerController _controller = CamCodeScannerController();
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -51,7 +48,49 @@ class _MyAppState extends State<MyApp> {
   void openScanner(BuildContext context, Function(String) onResult) {
     showDialog(
       context: context,
-      builder: (context) => Stack(
+      builder: (context) => CamCodeScannerPage(_onResult),
+    );
+  }
+}
+
+class CamCodeScannerPage extends StatefulWidget {
+  final Function(String) onResult;
+
+  CamCodeScannerPage(this.onResult);
+
+  @override
+  _CamCodeScannerPageState createState() => _CamCodeScannerPageState();
+}
+
+class _CamCodeScannerPageState extends State<CamCodeScannerPage> {
+  /// Create a controller to send instructions to scanner
+  final CamCodeScannerController _controller = CamCodeScannerController();
+
+  /// List of availables cameras
+  final List<String> cameraNames = [];
+
+  /// currently selected camera
+  late String _selectedCamera;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDeviceList();
+  }
+
+  void _fetchDeviceList() async {
+    /// Get list of available cameras
+    final cameras = await _controller.fetchDeviceList();
+    setState(() {
+      cameraNames.addAll(cameras);
+      _selectedCamera = cameras.first;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
         children: [
           CamCodeScanner(
             width: MediaQuery.of(context).size.width,
@@ -59,19 +98,44 @@ class _MyAppState extends State<MyApp> {
             refreshDelayMillis: 200,
             onBarcodeResult: (barcode) {
               Navigator.of(context).pop();
-              onResult(barcode);
+              widget.onResult(barcode);
             },
             controller: _controller,
             showDebugFrames: true,
           ),
           Positioned(
             bottom: 48.0,
-            left: MediaQuery.of(context).size.width / 2,
-            child: ElevatedButton(
-              onPressed: () {
-                _controller.releaseResources();
-              },
-              child: Text('Release resources'),
+            left: 48.0,
+            child: Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    _controller.releaseResources();
+                  },
+                  child: Text('Release resources'),
+                ),
+                cameraNames.isEmpty
+                    ? Container()
+                    : DropdownButton(
+                        items: cameraNames
+                            .map(
+                              (name) => DropdownMenuItem(
+                                child: Text(name),
+                                value: name,
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (String? value) {
+                          if (value != null) {
+                            _controller.selectDevice(value);
+                            setState(() {
+                              _selectedCamera = value;
+                            });
+                          }
+                        },
+                        value: _selectedCamera,
+                      ),
+              ],
             ),
           ),
         ],
