@@ -1,3 +1,7 @@
+## 2.2.1
+
+- Improve scan performance (JS Library changed)
+
 ## 2.2.0
 
 - Add camera selection option

@@ -95,7 +95,7 @@ class _CamCodeScannerPageState extends State<CamCodeScannerPage> {
           CamCodeScanner(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            refreshDelayMillis: 200,
+            refreshDelayMillis: 16,
             onBarcodeResult: (barcode) {
               Navigator.of(context).pop();
               widget.onResult(barcode);

@@ -142,43 +142,43 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                         height: widget.height,
                         child: _webcamWidget,
                       ),
-                      if (widget.showDebugFrames)
-                        Container(
-                          width: widget.width,
-                          height: widget.height,
-                          color: Colors.black.withOpacity(0.8),
-                          child: Text(''),
-                        ),
-                      Positioned(
-                        top: (widget.height / 2) - (widget.height * .1),
-                        left: (widget.width * .1),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.green,
-                              width: 1,
-                            ),
-                          ),
-                          child: SizedBox(
-                            width: widget.width * .8,
-                            height: widget.height * .2,
-                            child: widget.showDebugFrames
-                                ? _imageWidget
-                                : Container(),
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: CustomPaint(
-                          size: Size(
-                            widget.width * .5,
-                            widget.height * .2,
-                          ),
-                          painter: _ScannerLine(
-                            color: Colors.red,
-                          ),
-                        ),
-                      ),
+                      // if (widget.showDebugFrames)
+                      //   Container(
+                      //     width: widget.width,
+                      //     height: widget.height,
+                      //     color: Colors.black.withOpacity(0.8),
+                      //     child: Text(''),
+                      //   ),
+                      // Positioned(
+                      //   top: (widget.height / 2) - (widget.height * .1),
+                      //   left: (widget.width * .1),
+                      //   child: Container(
+                      //     decoration: BoxDecoration(
+                      //       border: Border.all(
+                      //         color: Colors.green,
+                      //         width: 1,
+                      //       ),
+                      //     ),
+                      //     child: SizedBox(
+                      //       width: widget.width * .8,
+                      //       height: widget.height * .2,
+                      //       child: widget.showDebugFrames
+                      //           ? _imageWidget
+                      //           : Container(),
+                      //     ),
+                      //   ),
+                      // ),
+                      //Center(
+                      //  child: CustomPaint(
+                      //    size: Size(
+                      //      widget.width * .5,
+                      //      widget.height * .2,
+                      //    ),
+                      //    painter: _ScannerLine(
+                      //      color: Colors.red,
+                      //    ),
+                      //  ),
+                      //),
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: Padding(
