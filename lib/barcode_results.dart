@@ -1,6 +1,8 @@
 /// Store and count every potential result
-/// Once a barcode was identified 3 times, it is considered as a valid result
+/// Once a barcode was identified minimalResultCount times, it is considered as a valid result
 class BarcodeResults {
+  static const minimalResultCount = 2;
+
   /// list of barcode results
   final Map<String, int> _barcodeResults = {};
 
@@ -14,9 +16,9 @@ class BarcodeResults {
 
   /// Consider that we have a barcode result once enough identic results are found
   bool get gotResult =>
-      resultCount > 2 &&
+      resultCount >= 2 &&
       _barcodeResults.values.any(
-        (singleBarcodeCount) => singleBarcodeCount > 2,
+        (singleBarcodeCount) => singleBarcodeCount >= minimalResultCount,
       );
 
   /// adds a new barcode result

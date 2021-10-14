@@ -109,7 +109,7 @@ class CamcodeWeb {
       ..height = height.toInt()
       ..style.width = '100%'
       ..style.height = '100%'
-      ..style.objectFit = 'cover'
+      ..style.objectFit = 'contain'
       ..autoplay = true
       ..muted = true;
     _webcamVideoElement.setAttribute('playsinline', 'true');
@@ -174,8 +174,8 @@ class CamcodeWeb {
           'deviceId':
               _selectedDeviceId != null ? {'exact': _selectedDeviceId} : null,
           'facingMode': {'exact': 'environment'},
-          'width': width.toInt(),
-          'height': height.toInt()
+          //'width': width.toInt(),
+          //'height': height.toInt()
         }
       };
     } else {
@@ -184,8 +184,8 @@ class CamcodeWeb {
         'video': {
           'deviceId':
               _selectedDeviceId != null ? {'exact': _selectedDeviceId} : null,
-          'width': width.toInt(),
-          'height': height.toInt()
+          //'width': width.toInt(),
+          //'height': height.toInt()
         }
       };
     }
@@ -229,21 +229,30 @@ class CamcodeWeb {
   /// and process it for barcode identification
   Future<void> _takePicture() async {
     final context = _canvasElement.context2D;
+    context.filter = 'grayscale(1)';
 
-    context.drawImageScaledFromSource(
+    //context.drawImageScaledFromSource(
+    //  _webcamVideoElement,
+    //  _webcamVideoElement.videoWidth * .1, // X IN VIDEO
+    //  (_webcamVideoElement.videoHeight * .5) -
+    //      (_webcamVideoElement.videoHeight * .1), // Y IN VIDEO
+    //  _webcamVideoElement.videoWidth * .8, // WIDTH IN VIDEO
+    //  _webcamVideoElement.videoHeight * .2, // HEIGHT IN VIDEO
+    //  0, // X IN CANVAS
+    //  0, // Y IN CANVAS
+    //  (_canvasElement.width ?? 0), // WIDTH IN CANVAS
+    //  _canvasElement.height ?? 0, // HEIGHT IN CANVAS
+    //);
+
+    context.drawImageScaled(
       _webcamVideoElement,
-      _webcamVideoElement.videoWidth * .2, // X IN VIDEO
-      (_webcamVideoElement.videoHeight * .5) -
-          (_webcamVideoElement.videoHeight * .05), // Y IN VIDEO
-      _webcamVideoElement.videoWidth * .6, // WIDTH IN VIDEO
-      _webcamVideoElement.videoHeight * .1, // HEIGHT IN VIDEO
-      0, // X IN CANVAS
-      0, // Y IN CANVAS
-      (_canvasElement.width ?? 0), // WIDTH IN CANVAS
-      _canvasElement.height ?? 0, // HEIGHT IN CANVAS
+      0,
+      0,
+      _webcamVideoElement.width,
+      _webcamVideoElement.height,
     );
 
-    final dataUrl = _canvasElement.toDataUrl('image/png');
+    final dataUrl = _canvasElement.toDataUrl('image/jpeg', 1.0);
     imageElement.src = dataUrl;
 
     detectBarcode(dataUrl, allowInterop((result) => onBarcodeResult(result)));
