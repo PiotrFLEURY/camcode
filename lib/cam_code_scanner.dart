@@ -54,7 +54,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
   late Widget _webcamWidget;
 
   /// Debug frame Image widget to insert into the tree
-  late Widget _imageWidget;
+  //late Widget _imageWidget;
 
   /// The barcode result
   String barcode = '';
@@ -94,9 +94,9 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
       viewType: 'webcamVideoElement$time',
     );
 
-    _imageWidget = HtmlElementView(
-      viewType: 'imageElement',
-    );
+    //_imageWidget = HtmlElementView(
+    //  viewType: 'imageElement',
+    //);
 
     // Set the initialized flag
     setState(() {
@@ -197,11 +197,11 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
 }
 
 /// Custom painter to draw the scanner line
-class _ScannerLine extends CustomPainter {
+class ScannerLine extends CustomPainter {
   /// Color of the line
   final Color color;
 
-  _ScannerLine({
+  ScannerLine({
     this.color = Colors.white,
   });
 
