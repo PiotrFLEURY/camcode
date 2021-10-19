@@ -27,6 +27,12 @@ class CamCodeScanner extends StatefulWidget {
   /// controller to control the camera from outside
   final CamCodeScannerController? controller;
 
+  /// The color of the background mask
+  final Color backgroundColor;
+
+  /// shows the current analysing picture
+  final bool showScannerLine;
+
   /// Camera barcode scanner widget
   /// Params:
   /// * showDebugFrames [true|false] - shows the current analysing picture
@@ -38,8 +44,10 @@ class CamCodeScanner extends StatefulWidget {
     required this.onBarcodeResult,
     required this.width,
     required this.height,
-    this.refreshDelayMillis = 400,
+    this.refreshDelayMillis = 1000,
     this.controller,
+    this.backgroundColor = Colors.black54,
+    this.showScannerLine = true,
   });
 
   @override
@@ -54,7 +62,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
   late Widget _webcamWidget;
 
   /// Debug frame Image widget to insert into the tree
-  //late Widget _imageWidget;
+  late Widget _imageWidget;
 
   /// The barcode result
   String barcode = '';
@@ -94,9 +102,9 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
       viewType: 'webcamVideoElement$time',
     );
 
-    //_imageWidget = HtmlElementView(
-    //  viewType: 'imageElement',
-    //);
+    _imageWidget = HtmlElementView(
+      viewType: 'imageElement',
+    );
 
     // Set the initialized flag
     setState(() {
@@ -142,43 +150,44 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
                         height: widget.height,
                         child: _webcamWidget,
                       ),
-                      // if (widget.showDebugFrames)
-                      //   Container(
-                      //     width: widget.width,
-                      //     height: widget.height,
-                      //     color: Colors.black.withOpacity(0.8),
-                      //     child: Text(''),
-                      //   ),
-                      // Positioned(
-                      //   top: (widget.height / 2) - (widget.height * .1),
-                      //   left: (widget.width * .1),
-                      //   child: Container(
-                      //     decoration: BoxDecoration(
-                      //       border: Border.all(
-                      //         color: Colors.green,
-                      //         width: 1,
-                      //       ),
-                      //     ),
-                      //     child: SizedBox(
-                      //       width: widget.width * .8,
-                      //       height: widget.height * .2,
-                      //       child: widget.showDebugFrames
-                      //           ? _imageWidget
-                      //           : Container(),
-                      //     ),
-                      //   ),
-                      // ),
-                      //Center(
-                      //  child: CustomPaint(
-                      //    size: Size(
-                      //      widget.width * .5,
-                      //      widget.height * .2,
-                      //    ),
-                      //    painter: _ScannerLine(
-                      //      color: Colors.red,
-                      //    ),
-                      //  ),
-                      //),
+                      Container(
+                        width: widget.width,
+                        height: (widget.height / 2) - (widget.height / 8),
+                        color: widget.backgroundColor,
+                        child: Text(''),
+                      ),
+                      Positioned(
+                        top: (widget.height / 2) + (widget.height / 8),
+                        left: 0,
+                        child: Container(
+                          width: widget.width,
+                          height: (widget.height / 2) - (widget.height / 8),
+                          color: widget.backgroundColor,
+                          child: Text(''),
+                        ),
+                      ),
+                      if (widget.showDebugFrames)
+                        Positioned(
+                          top: widget.height * .4,
+                          left: 0,
+                          child: SizedBox(
+                            width: widget.width,
+                            height: widget.height * .2,
+                            child: _imageWidget,
+                          ),
+                        ),
+                      if (widget.showScannerLine)
+                        Center(
+                          child: CustomPaint(
+                            size: Size(
+                              widget.width,
+                              widget.height * .2,
+                            ),
+                            painter: ScannerLine(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: Padding(
