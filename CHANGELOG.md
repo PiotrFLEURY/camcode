@@ -1,6 +1,6 @@
 ## 2.2.1
 
-- Improve scan performance (JS Library changed)
+- Improve scan performance
 
 ## 2.2.0
 
