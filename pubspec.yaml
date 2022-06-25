@@ -26,6 +26,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  every_test: ^1.0.0
   pedantic: ^1.9.0
 
 environment:

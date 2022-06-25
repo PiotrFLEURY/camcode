@@ -69,6 +69,7 @@ class CamcodeWeb {
           arguments[0],
           arguments[1],
           arguments[2],
+          arguments[3],
         );
       case 'releaseResources':
         return releaseResources();
@@ -107,9 +108,12 @@ class CamcodeWeb {
     double width,
     double height,
     int refreshDelayMillis,
+    int minimalResultCount,
   ) {
     completer = Completer<String>();
     _enumerateDevicesCompleter = Completer<List<String>>();
+    _barcodeResults.singleShot = minimalResultCount == 1;
+    _barcodeResults.minimalResultCount = minimalResultCount;
     _barcodeResults.clear();
 
     // Create a video element which will be provided with stream source

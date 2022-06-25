@@ -33,6 +33,9 @@ class CamCodeScanner extends StatefulWidget {
   /// shows the current analysing picture
   final bool showScannerLine;
 
+  /// Number of identic scanned value to get before consider getting result
+  final int minimalResultCount;
+
   /// Camera barcode scanner widget
   /// Params:
   /// * showDebugFrames [true|false] - shows the current analysing picture
@@ -48,6 +51,7 @@ class CamCodeScanner extends StatefulWidget {
     this.controller,
     this.backgroundColor = Colors.black54,
     this.showScannerLine = true,
+    this.minimalResultCount = 2,
   });
 
   @override
@@ -93,6 +97,7 @@ class _CamCodeScannerState extends State<CamCodeScanner> {
         widget.width,
         widget.height,
         widget.refreshDelayMillis,
+        widget.minimalResultCount,
       ],
     );
 
