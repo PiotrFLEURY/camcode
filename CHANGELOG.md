@@ -1,3 +1,7 @@
+## 3.0.0
+
+- Upgrade to Flutter 3
+
 ## 2.2.1
 
 - Improve scan performance
