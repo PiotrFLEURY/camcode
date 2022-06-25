@@ -101,7 +101,8 @@ class _CamCodeScannerPageState extends State<CamCodeScannerPage> {
               widget.onResult(barcode);
             },
             controller: _controller,
-            showDebugFrames: true,
+            showDebugFrames: false,
+            minimalResultCount: 1,
           ),
           Positioned(
             bottom: 48.0,
