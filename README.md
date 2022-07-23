@@ -41,6 +41,7 @@ showDialog(
     onBarcodeResult: (barcode) {
         // do whatever you want
     },
+    minimalResultCount: 2,
     ),
 );
 ```
